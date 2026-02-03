@@ -15,7 +15,7 @@ spec:
         app: backend
     spec:
       containers:
-      - name: backendecr
+      - name: backendecrImage
         image: 101561167685.dkr.ecr.us-east-1.amazonaws.com/tetris-backend
         ports:
         - containerPort: 4000
