@@ -1,0 +1,54 @@
+---
+- name: Install Helm 3
+  hosts: localhost
+  become: yes
+  vars:
+    helm_version: "v3.14.2"
+    helm_os: linux
+    helm_arch: amd64
+    helm_tarball: "helm-{{ helm_version }}-{{ helm_os }}-{{ helm_arch }}.tar.gz"
+    helm_url: "https://get.helm.sh/{{ helm_tarball }}"
+
+  tasks:
+    - name: Download Helm archive
+      get_url:
+        url: "{{ helm_url }}"
+        dest: "/tmp/{{ helm_tarball }}"
+        mode: '0644'
+
+    - name: Extract Helm archive
+      unarchive:
+        src: "/tmp/{{ helm_tarball }}"
+        dest: /tmp
+        remote_src: yes
+
+    - name: Move helm binary to /usr/local/bin
+      copy:
+        src: "/tmp/{{ helm_os }}-{{ helm_arch }}/helm"
+        dest: /usr/local/bin/helm
+        mode: '0755'
+        remote_src: yes
+
+    - name: Verify Helm installation
+      command: helm version --short
+      register: helm_version_output
+
+    - name: Show Helm version
+      debug:
+        msg: "{{ helm_version_output.stdout }}"
+    
+  
+    - name: Add ArgoCD Helm repo
+      kubernetes.core.helm_repository:
+        name: argo
+        repo_url: https://argoproj.github.io/argo-helm
+        # kubeconfig: /home/lina/.kube/config
+
+    - name: Install ArgoCD
+      kubernetes.core.helm:
+        name: argocd
+        chart_ref: argo/argo-cd
+        release_namespace: argocd
+        create_namespace: true
+        # kubeconfig: /home/lina/.kube/config
+
