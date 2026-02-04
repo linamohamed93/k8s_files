@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  labels:
+    app: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backendecrImage
+        image: 101561167685.dkr.ecr.us-east-1.amazonaws.com/tetris-backend
+        ports:
+        - containerPort: 4000
+
+        
+        
+      
